@@ -2,7 +2,6 @@ import tensorflow_hub as hub
 import numpy as np
 import tensorflow_text
 from simple_http_server import route, server, Parameter, JSONBody
-import requests
 
 # Some texts of different lengths.
 russian_sentences1 = ["Собака", "Щенки хорошенькие.", "Я люблю гулять вдоль пляжа с собакой."]
