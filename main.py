@@ -2,6 +2,7 @@ import tensorflow_hub as hub
 import numpy as np
 import tensorflow_text
 from simple_http_server import route, server, Parameter, JSONBody
+import requests
 
 # Some texts of different lengths.
 russian_sentences1 = ["Собака", "Щенки хорошенькие.", "Я люблю гулять вдоль пляжа с собакой."]
@@ -38,13 +39,16 @@ def train(data=JSONBody([])):
     set_qa(data)
     return {"success": True}
 
-@route("/guess", method=["GET"])
-def guess(guess):
+@route("/guess", method=["POST"])
+def guess(data=JSONBody()):
     global qa
+    guess = data.get('guess')
+    if not guess:
+        return {"success": False}
     best_ans_key, probability = make_guess(guess)
     best_ans = qa[best_ans_key]
     if best_ans and probability > 0.5:
-        return {"success": True, "ans": best_ans}
-    return {"success": False}
+        return {"success": True, "ans": best_ans, "guess": guess}
+    return {"success": False, "guess": guess}
 
 server.start(port=8080)
