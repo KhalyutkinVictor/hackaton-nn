@@ -35,19 +35,25 @@ def set_qa(val):
 
 @route("/train", method=["POST"])
 def train(data=JSONBody([])):
-    set_qa(data)
+    try:
+        set_qa(data)
+    except Exception as e:
+        return {"success": False}
     return {"success": True}
 
 @route("/guess", method=["POST"])
 def guess(data=JSONBody()):
     global qa
-    guess = data.get('guess')
-    if not guess:
+    try:
+        guess = data.get('guess')
+        if not guess:
+            return {"success": False}
+        best_ans_key, probability = make_guess(guess)
+        best_ans = qa[best_ans_key]
+        if best_ans and probability > 0.5:
+            return {"success": True, "ans": best_ans, "guess": guess}
+        return {"success": False, "guess": guess}
+    except Exception as e:
         return {"success": False}
-    best_ans_key, probability = make_guess(guess)
-    best_ans = qa[best_ans_key]
-    if best_ans and probability > 0.5:
-        return {"success": True, "ans": best_ans, "guess": guess}
-    return {"success": False, "guess": guess}
 
 server.start(port=8080)
